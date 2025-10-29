@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="12"/>
+    <BuildModes Active="Default"/>
+    <Units>
+      <Unit>
+        <Filename Value="AllDTRs.ppr"/>
+        <FRMtype Value="0"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="41"/>
+      </Unit>
+      <Unit>
+        <Filename Value="AllDTRsMainForm.pas"/>
+        <FRMtype Value="200"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmAllDTRsMain"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="0"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="79"/>
+        <CursorPos X="48" Y="83"/>
+        <UsageCount Value="41"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="frTabsFrame.pas"/>
+        <FRMtype Value="400"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frTabs"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+        <EditorIndex Value="2"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="91"/>
+        <CursorPos Y="98"/>
+        <UsageCount Value="39"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <FRMtype Value="400"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frDTR"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+        <EditorIndex Value="1"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="196"/>
+        <CursorPos X="32" Y="206"/>
+        <UsageCount Value="34"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\codetyphon\typhon\components\packages_pl\pl_ECControls\source\ectabctrl.pas"/>
+        <FRMtype Value="0"/>
+        <UnitName Value="ECTabCtrl"/>
+        <EditorIndex Value="3"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="308"/>
+        <CursorPos X="14" Y="347"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\codetyphon\typhon\lcl\forms.pp"/>
+        <FRMtype Value="0"/>
+        <UnitName Value="Forms"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="339"/>
+        <CursorPos X="5" Y="351"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\codetyphon\typhon\lcl\controls.pp"/>
+        <FRMtype Value="0"/>
+        <UnitName Value="Controls"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1700"/>
+        <CursorPos X="14" Y="1711"/>
+        <UsageCount Value="10"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\codetyphon\typhon\lcl\comctrls.pp"/>
+        <FRMtype Value="0"/>
+        <UnitName Value="ComCtrls"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="337"/>
+        <CursorPos X="3" Y="350"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\codetyphon\typhon\components\packages_pl\pl_VirtualTrees\source\virtualtrees.pas"/>
+        <FRMtype Value="0"/>
+        <UnitName Value="VirtualTrees"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="5291"/>
+        <CursorPos Y="5304"/>
+        <UsageCount Value="10"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\codetyphon\typhon\lcl\include\canvas.inc"/>
+        <FRMtype Value="0"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1781"/>
+        <CursorPos Y="1802"/>
+        <UsageCount Value="10"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\codetyphon\typhon\lcl\graphics.pp"/>
+        <FRMtype Value="0"/>
+        <UnitName Value="Graphics"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1801"/>
+        <CursorPos Y="1814"/>
+        <UsageCount Value="10"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\codetyphon\typhon\lcl\include\control.inc"/>
+        <FRMtype Value="0"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="3627"/>
+        <CursorPos Y="3639"/>
+        <UsageCount Value="10"/>
+      </Unit>
+    </Units>
+    <Debugger>
+      <Backend Value="{DB9F04B0-0A5B-44F9-B302-3B0BEB854719}"/>
+    </Debugger>
+    <JumpHistory HistoryIndex="29">
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="319" Column="37" TopLine="314"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="321" Column="37" TopLine="316"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="413" Column="28" TopLine="405"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="530" Column="36" TopLine="523"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="436" Column="36" TopLine="431"/>
+      </Position>
+      <Position>
+        <Filename Value="AllDTRsMainForm.pas"/>
+        <Caret Line="5" Column="34"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="4" Column="33"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="421" Column="28" TopLine="410"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="428" Column="39" TopLine="415"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="431" TopLine="427"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="430" Column="30" TopLine="419"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="441" Column="21" TopLine="427"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="439" Column="29" TopLine="427"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="438" Column="41" TopLine="425"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="597" Column="26" TopLine="584"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="614" Column="25" TopLine="599"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="621" Column="28" TopLine="606"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="33" Column="11" TopLine="22"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="181" Column="18" TopLine="168"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="132" Column="27" TopLine="120"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="621" Column="54" TopLine="611"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="626" Column="35" TopLine="604"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="627" Column="35" TopLine="605"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="626" Column="35" TopLine="617"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="209" Column="27" TopLine="195"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="604" Column="31" TopLine="586"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="620" Column="32" TopLine="598"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="624" Column="47" TopLine="602"/>
+      </Position>
+      <Position>
+        <Filename Value="..\frDTRFrame.pas"/>
+        <Caret Line="142" Column="44" TopLine="131"/>
+      </Position>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+  <Debugging>
+    <BreakPoints>
+      <Item>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="frTabsFrame.pas"/>
+        <Line Value="314"/>
+      </Item>
+      <Item>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="AllDTRsMainForm.pas"/>
+        <Line Value="205"/>
+      </Item>
+      <Item>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\frDTRFrame.pas"/>
+        <Line Value="415"/>
+      </Item>
+      <Item>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\frDTRFrame.pas"/>
+        <Line Value="846"/>
+      </Item>
+    </BreakPoints>
+  </Debugging>
+</CONFIG>
