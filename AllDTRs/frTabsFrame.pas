@@ -1,5 +1,5 @@
 {
-    Copyright (C) 2025 VCC
+    Copyright (C) 2026 VCC
     creation date: 28 Oct 2025
     initial release date: 29 Oct 2025
 
@@ -75,6 +75,7 @@ type
     procedure SetTabCaption(ATabContent: Pointer; ANewCaption: string);
     procedure SetTabVisibilityByIndex(AIndex: Integer; AVisibility: Boolean);
     function AddTabToEnd: Pointer; //returns tab content
+    procedure DeleteTab(ATabIndex: Integer);
 
     property TabCount: Integer read GetTabCount;
     property ActiveTabIndex: Integer read GetActiveTabIndex write SetActiveTabIndex;
@@ -229,6 +230,21 @@ var
 begin
   Tab := ECTabCtrl1.AddTab(etaLast, False);
   Result := Content[Tab.Index];
+end;
+
+
+procedure TfrTabs.DeleteTab(ATabIndex: Integer);
+begin
+  if (ATabIndex > -1) and (ATabIndex < ECTabCtrl1.Tabs.Count) then
+    ECTabCtrl1.DeleteTab(ATabIndex);
+
+  //Range check needed, because ECTabCtrl1Change is called right after deleting the last remaining tab. This deletes the single remaining item from FTabIDs and FTabContents.
+  if (ATabIndex > -1) and (ATabIndex < FTabIDs.Count) then
+    FTabIDs.Delete(ATabIndex);
+
+  //Range check needed, because ECTabCtrl1Change is called right after deleting the last remaining tab. This deletes the single remaining item from FTabIDs and FTabContents.
+  if (ATabIndex > -1) and (ATabIndex < FTabContents.Count) then
+    FTabContents.Delete(ATabIndex);
 end;
 
 

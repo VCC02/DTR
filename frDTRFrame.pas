@@ -1,5 +1,5 @@
 {
-    Copyright (C) 2025 VCC
+    Copyright (C) 2026 VCC
     creation date: 10 Sep 2025
     initial release date: 29 Oct 2025
 

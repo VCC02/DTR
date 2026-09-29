@@ -136,18 +136,24 @@ object frDTR: TfrDTR
   object btnAddLine: TButton
     Left = 304
     Height = 25
+    Hint = 'Add new line to list.'
     Top = 8
     Width = 104
     Caption = 'Add line'
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 6
     OnClick = btnAddLineClick
   end
   object btnNewProject: TButton
     Left = 8
     Height = 25
+    Hint = 'New project (New content)'
     Top = 8
     Width = 40
     Caption = 'New'
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 7
     OnClick = btnNewProjectClick
   end

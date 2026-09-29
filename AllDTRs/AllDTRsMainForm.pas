@@ -1,5 +1,5 @@
 {
-    Copyright (C) 2025 VCC
+    Copyright (C) 2026 VCC
     creation date: 26 Oct 2025
     initial release date: 29 Oct 2025
 
@@ -30,7 +30,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ECTabCtrl, ECTypes,
-  ComCtrls, StdCtrls, ExtCtrls, frTabsFrame;
+  ComCtrls, StdCtrls, ExtCtrls, Buttons, Menus, frTabsFrame, IniFiles;
 
 type
   { TfrmAllDTRsMain }
@@ -38,20 +38,45 @@ type
   TfrmAllDTRsMain = class(TForm)
     edtSearchL1: TEdit;
     edtSearchL2: TEdit;
+    MenuItem_AddSearchBoxValuesAsKeyReplacement: TMenuItem;
+    MenuItem_KeyReplacements: TMenuItem;
+    Separator2: TMenuItem;
+    MenuItem_SelectProjectGroup: TMenuItem;
+    Separator1: TMenuItem;
+    MenuItem_RemoveProjectGroup: TMenuItem;
+    MenuItem_AddProjectGroup: TMenuItem;
+    pmProjectGroups: TPopupMenu;
+    spdbtnProjectGroups: TSpeedButton;
     tmrStartup: TTimer;
     tmrSearch: TTimer;
     procedure edtSearchL1Change(Sender: TObject);
     procedure edtSearchL2Change(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
+    procedure MenuItem_AddProjectGroupClick(Sender: TObject);
+    procedure MenuItem_AddSearchBoxValuesAsKeyReplacementClick(Sender: TObject);
+    procedure spdbtnProjectGroupsClick(Sender: TObject);
     procedure tmrSearchTimer(Sender: TObject);
     procedure tmrStartupTimer(Sender: TObject);
   private
     frTabs: TfrTabs;
     FActiveTabIndexOnEmptySearch: Integer;
+    FActiveGroupIndex: Integer;
+    FProjectGroupsCount: Integer;
 
+    function GetGroupPrefixFromIndex: string;
+    procedure LoadActiveProjectGroup(Ini: TMemIniFile; GroupPrefix: string);
     procedure LoadSettingsFromIni;
+    procedure SaveActiveProjectGroup(Ini: TMemIniFile; GroupPrefix: string);
     procedure SaveSettingsToIni;
+
+    procedure CreateOneProjectGroupItem;
+    procedure CreateAllProjectGroupItems;
+    procedure UpdateProjectGroupMenuItemTags;
+    procedure CloseProjectGroup;
+
+    procedure HandleOnRemoveProjectGroup(Sender: TObject);
+    procedure HandleOnSelectProjectGroup(Sender: TObject);
 
     procedure HandleOnAddTab(out ATabContent: Pointer);
     procedure HandleOnDeleteTab(ATabContent: Pointer);
@@ -72,7 +97,7 @@ implementation
 
 
 uses
-  frDTRFrame, IniFiles;
+  frDTRFrame;
 
 { TfrmAllDTRsMain }
 
@@ -82,7 +107,7 @@ begin
   frTabs.Parent := frmAllDTRsMain;
   frTabs.Left := 0;
   frTabs.Top := 0;
-  frTabs.Width := edtSearchL1.Left - 8;
+  frTabs.Width := spdbtnProjectGroups.Left - 8;
   frTabs.Height := 26;
   frTabs.Anchors := [akLeft, akTop, akRight];
 
@@ -91,16 +116,178 @@ begin
   frTabs.OnChangeTab := @HandleOnChangeTab;
 
   FActiveTabIndexOnEmptySearch := -1;
+  FActiveGroupIndex := -1;
+  FProjectGroupsCount := 0;
+
   tmrStartup.Enabled := True;
+end;
+
+
+procedure TfrmAllDTRsMain.HandleOnRemoveProjectGroup(Sender: TObject);
+var
+  Idx: Integer;
+begin
+  if MessageDlg('Are you sure you want to remove this project group?', mtConfirmation, [mbYes, mbNo], 0, mbYes) = mrNo then
+    Exit;
+
+  Idx := (Sender as TMenuItem).Tag;
+  MenuItem_RemoveProjectGroup.Delete(Idx);
+  MenuItem_SelectProjectGroup.Delete(Idx);
+  FActiveGroupIndex := 0;
+  Dec(FProjectGroupsCount);
+
+  UpdateProjectGroupMenuItemTags;
+end;
+
+
+procedure TfrmAllDTRsMain.HandleOnSelectProjectGroup(Sender: TObject);
+var
+  Ini: TMemIniFile;
+  GroupPrefix: string;
+  NewActiveGroupIndex: Integer;
+begin
+  NewActiveGroupIndex := (Sender as TMenuItem).Tag;
+  if NewActiveGroupIndex = FActiveGroupIndex then
+    Exit;
+
+  SaveSettingsToIni; //save group settings
+  CloseProjectGroup;
+
+  FActiveGroupIndex := NewActiveGroupIndex;
+  GroupPrefix := GetGroupPrefixFromIndex;
+
+  Ini := TMemIniFile.Create(ExtractFilePath(ParamStr(0)) + 'AllDTRs.ini');
+  try
+    MenuItem_SelectProjectGroup.Items[FActiveGroupIndex].Checked := True;
+    LoadActiveProjectGroup(Ini, GroupPrefix);
+  finally
+    Ini.Free;
+  end;
+end;
+
+
+procedure TfrmAllDTRsMain.CreateOneProjectGroupItem;
+var
+  TempMenuItem: TMenuItem;
+begin
+  //TempMenuItem := TMenuItem.Create(nil);
+  try
+    TempMenuItem := TMenuItem.Create(nil);
+    TempMenuItem.OnClick := @HandleOnRemoveProjectGroup;
+    MenuItem_RemoveProjectGroup.Add(TempMenuItem);
+
+    TempMenuItem := TMenuItem.Create(nil);
+    TempMenuItem.GroupIndex := 0;
+    TempMenuItem.AutoCheck := True;
+    TempMenuItem.RadioItem := True;
+    TempMenuItem.Checked := False; //do not select yet
+    TempMenuItem.OnClick := @HandleOnSelectProjectGroup;
+    MenuItem_SelectProjectGroup.Add(TempMenuItem);
+  finally
+    //TempMenuItem.Free;
+  end;
+end;
+
+
+procedure TfrmAllDTRsMain.CreateAllProjectGroupItems;
+var
+  i: Integer;
+begin
+  for i := 0 to FProjectGroupsCount - 1 do
+    CreateOneProjectGroupItem;
+
+  UpdateProjectGroupMenuItemTags;
+end;
+
+
+procedure TfrmAllDTRsMain.UpdateProjectGroupMenuItemTags;
+var
+  i: Integer;
+begin
+  for i := 0 to FProjectGroupsCount - 1 do
+  begin
+    MenuItem_RemoveProjectGroup.Items[i].Tag := i;
+    MenuItem_SelectProjectGroup.Items[i].Tag := i;
+
+    MenuItem_RemoveProjectGroup.Items[i].Caption := 'Project group ' + IntToStr(i);
+    MenuItem_SelectProjectGroup.Items[i].Caption := 'Project group ' + IntToStr(i);
+  end;
+end;
+
+
+procedure TfrmAllDTRsMain.MenuItem_AddProjectGroupClick(Sender: TObject);
+begin
+  Inc(FProjectGroupsCount);
+  CreateOneProjectGroupItem;
+  UpdateProjectGroupMenuItemTags;
+
+  //FActiveGroupIndex := FProjectGroupsCount - 1;
+  //MenuItem_SelectProjectGroup.Items[FActiveGroupIndex].Checked := True; //select the new group when adding
+end;
+
+
+procedure TfrmAllDTRsMain.MenuItem_AddSearchBoxValuesAsKeyReplacementClick(Sender: TObject);
+begin
+  //
+end;
+
+
+procedure TfrmAllDTRsMain.spdbtnProjectGroupsClick(Sender: TObject);
+begin
+  pmProjectGroups.PopUp;
+end;
+
+
+function TfrmAllDTRsMain.GetGroupPrefixFromIndex: string;
+begin
+  Result := 'Grp_' + IntToStr(FActiveGroupIndex) + '.';
+end;
+
+
+procedure TfrmAllDTRsMain.LoadActiveProjectGroup(Ini: TMemIniFile; GroupPrefix: string);
+var
+  TabCount, i, ActiveTabIndex: Integer;
+  ProjectName: string;
+  Content: TfrDTR;
+  KeyReplacementsCount: Integer;
+begin
+  TabCount := Ini.ReadInteger('Settings', GroupPrefix + 'TabCount', 0);
+
+  for i := 0 to TabCount - 1 do
+  begin
+    Content := TfrDTR(frTabs.AddTabToEnd);
+    ProjectName := Ini.ReadString('Settings', GroupPrefix + 'ProjectName_' + IntToStr(i), '');
+
+    if ProjectName <> '' then
+      Content.LoadDTRProject(ProjectName);
+
+    Content.LoadSettingsFromIni(Ini, GroupPrefix + '_' + IntToStr(i));
+
+    KeyReplacementsCount := Ini.ReadInteger('KeyReplacements', GroupPrefix + 'Count', 0);
+    if (KeyReplacementsCount < 0) or (KeyReplacementsCount > 100) then
+      KeyReplacementsCount := 100;
+
+    SetLength(Content.KeyReplacementArr, KeyReplacementsCount);
+  end;
+
+  ActiveTabIndex := Ini.ReadInteger('Settings', GroupPrefix + 'ActiveTabIndex', 0);
+  if ActiveTabIndex < 0 then
+    if frTabs.TabCount > 0 then
+      ActiveTabIndex := 0;
+
+  frTabs.ActiveTabIndex := ActiveTabIndex;
+
+  //Apply settings again:
+  Application.ProcessMessages;
+  for i := 0 to TabCount - 1 do
+    Content.LoadSettingsFromIni(Ini, GroupPrefix + '_' + IntToStr(i));
 end;
 
 
 procedure TfrmAllDTRsMain.LoadSettingsFromIni;
 var
   Ini: TMemIniFile;
-  TabCount, i: Integer;
-  ProjectName: string;
-  Content: TfrDTR;
+  GroupPrefix: string;
 begin
   Ini := TMemIniFile.Create(ExtractFilePath(ParamStr(0)) + 'AllDTRs.ini');
   try
@@ -109,31 +296,53 @@ begin
     Width := Ini.ReadInteger('Window', 'Width', Width);
     Height := Ini.ReadInteger('Window', 'Height', Height);
 
-    TabCount := Ini.ReadInteger('Settings', 'TabCount', 0);
-
-    for i := 0 to TabCount - 1 do
+    FProjectGroupsCount := Ini.ReadInteger('ProjectGroups', 'ProjectGroupsCount', 0);
+    if FProjectGroupsCount <= 0 then
     begin
-      Content := TfrDTR(frTabs.AddTabToEnd);
-      ProjectName := Ini.ReadString('Settings', 'ProjectName_' + IntToStr(i), '');
-
-      if ProjectName <> '' then
-        Content.LoadDTRProject(ProjectName);
-
-      Content.LoadSettingsFromIni(Ini, '_' + IntToStr(i));
+      GroupPrefix := '';
+      FActiveGroupIndex := -1;
+    end
+    else
+    begin
+      FActiveGroupIndex := Ini.ReadInteger('ProjectGroups', 'ActiveGroupIndex', -1);
+      if (FActiveGroupIndex < 0) or (FActiveGroupIndex > FProjectGroupsCount - 1) then
+        GroupPrefix := ''
+      else
+        GroupPrefix := GetGroupPrefixFromIndex;
     end;
 
-    frTabs.ActiveTabIndex := Ini.ReadInteger('Settings', 'ActiveTabIndex', 0);
+    CreateAllProjectGroupItems;
+    LoadActiveProjectGroup(Ini, GroupPrefix);
+
+    if (FActiveGroupIndex >= 0) or (FActiveGroupIndex < FProjectGroupsCount - 1) then
+      MenuItem_SelectProjectGroup.Items[FActiveGroupIndex].Checked := True;
   finally
     Ini.Free;
   end;
 end;
 
 
+procedure TfrmAllDTRsMain.SaveActiveProjectGroup(Ini: TMemIniFile; GroupPrefix: string);
+var
+  i: Integer;
+  Content: TfrDTR;
+begin
+  Ini.WriteInteger('Settings', GroupPrefix + 'TabCount', frTabs.TabCount);
+  for i := 0 to frTabs.TabCount - 1 do
+  begin
+    Content := TfrDTR(frTabs.Content[i]);
+    Content.SaveSettingsToIni(Ini, GroupPrefix + '_' + IntToStr(i));
+    Ini.WriteString('Settings', GroupPrefix + 'ProjectName_' + IntToStr(i), Content.ProjectName);
+  end;
+
+  Ini.WriteInteger('Settings', GroupPrefix + 'ActiveTabIndex', frTabs.ActiveTabIndex);
+end;
+
+
 procedure TfrmAllDTRsMain.SaveSettingsToIni;
 var
   Ini: TMemIniFile;
-  i: Integer;
-  Content: TfrDTR;
+  GroupPrefix: string;
 begin
   Ini := TMemIniFile.Create(ExtractFilePath(ParamStr(0)) + 'AllDTRs.ini');
   try
@@ -142,15 +351,15 @@ begin
     Ini.WriteInteger('Window', 'Width', Width);
     Ini.WriteInteger('Window', 'Height', Height);
 
-    Ini.WriteInteger('Settings', 'TabCount', frTabs.TabCount);
-    for i := 0 to frTabs.TabCount - 1 do
-    begin
-      Content := TfrDTR(frTabs.Content[i]);
-      Content.SaveSettingsToIni(Ini, '_' + IntToStr(i));
-      Ini.WriteString('Settings', 'ProjectName_' + IntToStr(i), Content.ProjectName);
-    end;
+    Ini.WriteInteger('ProjectGroups', 'ProjectGroupsCount', FProjectGroupsCount);
+    Ini.WriteInteger('ProjectGroups', 'ActiveGroupIndex', FActiveGroupIndex);
 
-    Ini.WriteInteger('Settings', 'ActiveTabIndex', frTabs.ActiveTabIndex);
+    if FActiveGroupIndex < 0 then
+      GroupPrefix := ''
+    else
+      GroupPrefix := GetGroupPrefixFromIndex;
+
+    SaveActiveProjectGroup(Ini, GroupPrefix);
 
     Ini.UpdateFile;
   finally
@@ -234,6 +443,15 @@ procedure TfrmAllDTRsMain.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 begin
   SaveSettingsToIni;
+end;
+
+
+procedure TfrmAllDTRsMain.CloseProjectGroup;
+var
+  i: Integer;
+begin
+  for i := frTabs.TabCount - 1 downto 0 do
+    frTabs.DeleteTab(i);
 end;
 
 
