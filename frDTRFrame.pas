@@ -41,6 +41,12 @@ type
 
   TOnSetProjectName = procedure(Sender: TObject; AName: string) of object;
 
+  TKeyReplacement = record
+    OldKey, NewKey: string; //probably unicode
+  end;
+
+  TKeyReplacementArr = array of TKeyReplacement;
+
   { TfrDTR }
 
   TfrDTR = class(TFrame)
@@ -160,6 +166,9 @@ type
 
     property ProjectName: string read FProjectName;
     property OnSetProjectName: TOnSetProjectName write FOnSetProjectName;
+
+  public
+    KeyReplacementArr: TKeyReplacementArr;
   end;
 
 
@@ -178,12 +187,13 @@ begin
   inherited Create(TheOwner);
   FEditingText := '';
   FHold := False;
+  SetLength(KeyReplacementArr, 0);
 end;
 
 
 destructor TfrDTR.Destroy;
 begin
-  //
+  SetLength(KeyReplacementArr, 0);
   inherited Destroy;
 end;
 

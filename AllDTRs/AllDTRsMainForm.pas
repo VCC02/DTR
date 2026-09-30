@@ -125,12 +125,31 @@ end;
 
 procedure TfrmAllDTRsMain.HandleOnRemoveProjectGroup(Sender: TObject);
 var
-  Idx: Integer;
+  Idx, i: Integer;
+  ProjectNames, GroupPrefix, TempProjectName: string;
+  Ini: TMemIniFile;
 begin
-  if MessageDlg('Are you sure you want to remove this project group?', mtConfirmation, [mbYes, mbNo], 0, mbYes) = mrNo then
+  Idx := (Sender as TMenuItem).Tag;
+
+  Ini := TMemIniFile.Create(ExtractFilePath(ParamStr(0)) + 'AllDTRs.ini');
+  try
+    ProjectNames := '';
+    for i := 0 to 3 do
+      if i < frTabs.TabCount then
+      begin
+        GroupPrefix := 'Grp_' + IntToStr(Idx) + '.';
+        TempProjectName := Ini.ReadString('Settings', GroupPrefix + 'ProjectName_' + IntToStr(i), '');
+        ProjectNames := ProjectNames + ExtractFileName(TempProjectName) + #13#10;
+      end;
+  finally
+    Ini.Free;
+  end;
+
+  ProjectNames := ProjectNames + '...';
+
+  if MessageDlg('Are you sure you want to remove this project group?' + #13#10 + ProjectNames, mtConfirmation, [mbYes, mbNo], 0, mbYes) = mrNo then
     Exit;
 
-  Idx := (Sender as TMenuItem).Tag;
   MenuItem_RemoveProjectGroup.Delete(Idx);
   MenuItem_SelectProjectGroup.Delete(Idx);
   FActiveGroupIndex := 0;
@@ -221,8 +240,13 @@ begin
   CreateOneProjectGroupItem;
   UpdateProjectGroupMenuItemTags;
 
-  //FActiveGroupIndex := FProjectGroupsCount - 1;
-  //MenuItem_SelectProjectGroup.Items[FActiveGroupIndex].Checked := True; //select the new group when adding
+  if FProjectGroupsCount = 1 then
+    if MessageDlg('Do you want the currently loaded project group to be automatically set as the first project group of the list?', mtConfirmation, [mbYes, mbNo], 0, mbYes) = mrYes then
+    begin
+      FActiveGroupIndex := FProjectGroupsCount - 1;
+      MenuItem_SelectProjectGroup.Items[FActiveGroupIndex].Checked := True; //select the new group when adding
+      SaveSettingsToIni; //save group settings
+    end;
 end;
 
 
@@ -314,7 +338,7 @@ begin
     CreateAllProjectGroupItems;
     LoadActiveProjectGroup(Ini, GroupPrefix);
 
-    if (FActiveGroupIndex >= 0) or (FActiveGroupIndex < FProjectGroupsCount - 1) then
+    if (FActiveGroupIndex >= 0) and (FActiveGroupIndex < FProjectGroupsCount) then
       MenuItem_SelectProjectGroup.Items[FActiveGroupIndex].Checked := True;
   finally
     Ini.Free;

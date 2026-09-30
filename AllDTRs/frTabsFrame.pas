@@ -72,6 +72,7 @@ type
     constructor Create(TheOwner: TComponent); override;
     destructor Destroy; override;
 
+    function GetTabCaption(ATabContent: Pointer): string;
     procedure SetTabCaption(ATabContent: Pointer; ANewCaption: string);
     procedure SetTabVisibilityByIndex(AIndex: Integer; AVisibility: Boolean);
     function AddTabToEnd: Pointer; //returns tab content
@@ -197,6 +198,18 @@ begin
       end;
     end;
   end;
+end;
+
+
+function TfrTabs.GetTabCaption(ATabContent: Pointer): string;
+var
+  TabIndex: Integer;
+begin
+  TabIndex := GetTabIndexByContent(ATabContent);
+  if TabIndex = -1 then
+    raise Exception.Create('Tab not found by content.');
+
+  Result := ECTabCtrl1.Tabs.Items[TabIndex].Text;
 end;
 
 
