@@ -30,7 +30,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ECTabCtrl, ECTypes,
-  ComCtrls, StdCtrls, ExtCtrls, Buttons, Menus, frTabsFrame, IniFiles;
+  ComCtrls, StdCtrls, ExtCtrls, Buttons, Menus, frTabsFrame, IniFiles, LCLType,
+  frDTRFrame;
 
 type
   { TfrmAllDTRsMain }
@@ -38,6 +39,7 @@ type
   TfrmAllDTRsMain = class(TForm)
     edtSearchL1: TEdit;
     edtSearchL2: TEdit;
+    MenuItem_EnableKeyReplacements: TMenuItem;
     MenuItem_AddSearchBoxValuesAsKeyReplacement: TMenuItem;
     MenuItem_KeyReplacements: TMenuItem;
     Separator2: TMenuItem;
@@ -50,7 +52,9 @@ type
     tmrStartup: TTimer;
     tmrSearch: TTimer;
     procedure edtSearchL1Change(Sender: TObject);
+    procedure edtSearchL1UTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
     procedure edtSearchL2Change(Sender: TObject);
+    procedure edtSearchL2UTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure MenuItem_AddProjectGroupClick(Sender: TObject);
@@ -63,6 +67,7 @@ type
     FActiveTabIndexOnEmptySearch: Integer;
     FActiveGroupIndex: Integer;
     FProjectGroupsCount: Integer;
+    FKeyReplacementArr: TKeyReplacementArr;
 
     function GetGroupPrefixFromIndex: string;
     procedure LoadActiveProjectGroup(Ini: TMemIniFile; GroupPrefix: string);
@@ -77,6 +82,7 @@ type
 
     procedure HandleOnRemoveProjectGroup(Sender: TObject);
     procedure HandleOnSelectProjectGroup(Sender: TObject);
+    procedure HandleEditorUTF8KeyPress(var UTF8Key: TUTF8Char);
 
     procedure HandleOnAddTab(out ATabContent: Pointer);
     procedure HandleOnDeleteTab(ATabContent: Pointer);
@@ -95,9 +101,6 @@ implementation
 
 {$R *.frm}
 
-
-uses
-  frDTRFrame;
 
 { TfrmAllDTRsMain }
 
@@ -251,8 +254,13 @@ end;
 
 
 procedure TfrmAllDTRsMain.MenuItem_AddSearchBoxValuesAsKeyReplacementClick(Sender: TObject);
+var
+  n: Integer;
 begin
-  //
+  n := Length(FKeyReplacementArr);
+  SetLength(FKeyReplacementArr, n + 1);
+  FKeyReplacementArr[n].OldKey := edtSearchL1.Text;
+  FKeyReplacementArr[n].NewKey := edtSearchL2.Text;
 end;
 
 
@@ -275,8 +283,21 @@ var
   Content: TfrDTR;
   KeyReplacementsCount: Integer;
 begin
-  TabCount := Ini.ReadInteger('Settings', GroupPrefix + 'TabCount', 0);
+  MenuItem_EnableKeyReplacements.Checked := Ini.ReadBool('KeyReplacements', 'KeyReplacementsEnabled', False);
 
+  KeyReplacementsCount := Ini.ReadInteger('KeyReplacements', GroupPrefix + 'Count', 0);
+  if (KeyReplacementsCount < 0) or (KeyReplacementsCount > 100) then
+    KeyReplacementsCount := 100;
+
+  SetLength(FKeyReplacementArr, KeyReplacementsCount);
+
+  for i := 0 to Length(FKeyReplacementArr) - 1 do
+  begin
+    FKeyReplacementArr[i].OldKey := Ini.ReadString('KeyReplacements', GroupPrefix + 'OldKey_' + IntToStr(i), '');
+    FKeyReplacementArr[i].NewKey := Ini.ReadString('KeyReplacements', GroupPrefix + 'NewKey_' + IntToStr(i), '');
+  end;
+
+  TabCount := Ini.ReadInteger('Settings', GroupPrefix + 'TabCount', 0);
   for i := 0 to TabCount - 1 do
   begin
     Content := TfrDTR(frTabs.AddTabToEnd);
@@ -286,12 +307,6 @@ begin
       Content.LoadDTRProject(ProjectName);
 
     Content.LoadSettingsFromIni(Ini, GroupPrefix + '_' + IntToStr(i));
-
-    KeyReplacementsCount := Ini.ReadInteger('KeyReplacements', GroupPrefix + 'Count', 0);
-    if (KeyReplacementsCount < 0) or (KeyReplacementsCount > 100) then
-      KeyReplacementsCount := 100;
-
-    SetLength(Content.KeyReplacementArr, KeyReplacementsCount);
   end;
 
   ActiveTabIndex := Ini.ReadInteger('Settings', GroupPrefix + 'ActiveTabIndex', 0);
@@ -321,6 +336,7 @@ begin
     Height := Ini.ReadInteger('Window', 'Height', Height);
 
     FProjectGroupsCount := Ini.ReadInteger('ProjectGroups', 'ProjectGroupsCount', 0);
+
     if FProjectGroupsCount <= 0 then
     begin
       GroupPrefix := '';
@@ -360,6 +376,15 @@ begin
   end;
 
   Ini.WriteInteger('Settings', GroupPrefix + 'ActiveTabIndex', frTabs.ActiveTabIndex);
+
+  Ini.WriteBool('KeyReplacements', 'KeyReplacementsEnabled', MenuItem_EnableKeyReplacements.Checked);
+  Ini.WriteInteger('KeyReplacements', GroupPrefix + 'Count', Length(FKeyReplacementArr));
+
+  for i := 0 to Length(FKeyReplacementArr) - 1 do
+  begin
+    Ini.WriteString('KeyReplacements', GroupPrefix + 'OldKey_' + IntToStr(i), FKeyReplacementArr[i].OldKey);
+    Ini.WriteString('KeyReplacements', GroupPrefix + 'NewKey_' + IntToStr(i), FKeyReplacementArr[i].NewKey);
+  end;
 end;
 
 
@@ -447,6 +472,24 @@ begin
 end;
 
 
+procedure TfrmAllDTRsMain.HandleEditorUTF8KeyPress(var UTF8Key: TUTF8Char);
+var
+  i: Integer;
+begin
+  if MenuItem_EnableKeyReplacements.Checked then
+    for i := 0 to Length(FKeyReplacementArr) - 1 do
+      if UTF8Key = FKeyReplacementArr[i].OldKey then
+        UTF8Key := FKeyReplacementArr[i].NewKey;
+end;
+
+
+procedure TfrmAllDTRsMain.edtSearchL1UTF8KeyPress(Sender: TObject;
+  var UTF8Key: TUTF8Char);
+begin
+  HandleEditorUTF8KeyPress(UTF8Key);
+end;
+
+
 procedure TfrmAllDTRsMain.edtSearchL2Change(Sender: TObject);
 var
   i: Integer;
@@ -460,6 +503,13 @@ begin
     TfrDTR(frTabs.Content[i]).SetSearchL2(edtSearchL2.Text);
 
   tmrSearch.Enabled := True;
+end;
+
+
+procedure TfrmAllDTRsMain.edtSearchL2UTF8KeyPress(Sender: TObject;
+  var UTF8Key: TUTF8Char);
+begin
+  HandleEditorUTF8KeyPress(UTF8Key);
 end;
 
 
@@ -491,6 +541,8 @@ begin
   frDTR.Width := Width;
   frDTR.Height := Height - (frTabs.Top + frTabs.Height);
   frDTR.Anchors := [akLeft, akTop, akRight, akBottom];
+  frDTR.KeyReplacementArr := FKeyReplacementArr;
+  frDTR.EnableKeyReplacements := @MenuItem_EnableKeyReplacements.Checked;
   frDTR.OnSetProjectName := @HandleOnSetProjectName;
 
   ATabContent := frDTR; //pointer to the DTR frame

@@ -19,6 +19,7 @@ object frmAllDTRsMain: TfrmAllDTRsMain
     TabOrder = 0
     TextHint = 'Search All L1'
     OnChange = edtSearchL1Change
+    OnUTF8KeyPress = edtSearchL1UTF8KeyPress
   end
   object edtSearchL2: TEdit
     Left = 886
@@ -29,6 +30,7 @@ object frmAllDTRsMain: TfrmAllDTRsMain
     TabOrder = 1
     TextHint = 'Search All L2'
     OnChange = edtSearchL2Change
+    OnUTF8KeyPress = edtSearchL2UTF8KeyPress
   end
   object spdbtnProjectGroups: TSpeedButton
     Left = 568
@@ -169,7 +171,10 @@ object frmAllDTRsMain: TfrmAllDTRsMain
     end
     object MenuItem_KeyReplacements: TMenuItem
       Caption = 'Key replacements'
-      Visible = False
+      object MenuItem_EnableKeyReplacements: TMenuItem
+        AutoCheck = True
+        Caption = 'Enable key replacements'
+      end
       object MenuItem_AddSearchBoxValuesAsKeyReplacement: TMenuItem
         Caption = 'Add search box values as key replacement'
         OnClick = MenuItem_AddSearchBoxValuesAsKeyReplacementClick

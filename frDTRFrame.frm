@@ -88,6 +88,7 @@ object frDTR: TfrDTR
     TabOrder = 1
     TextHint = 'Search L1'
     OnChange = edtSearchL1Change
+    OnUTF8KeyPress = edtSearchL1UTF8KeyPress
   end
   object edtSearchL2: TEdit
     Left = 304
@@ -98,6 +99,7 @@ object frDTR: TfrDTR
     TabOrder = 2
     TextHint = 'Search L2'
     OnChange = edtSearchL2Change
+    OnUTF8KeyPress = edtSearchL2UTF8KeyPress
   end
   object spdbtnExtraSave: TSpeedButton
     Left = 272
@@ -249,6 +251,7 @@ object frDTR: TfrDTR
         ScrollBars = ssBoth
         TabOrder = 0
         WordWrap = False
+        OnUTF8KeyPress = memL1UTF8KeyPress
       end
     end
     object pnlL2: TPanel
@@ -275,6 +278,7 @@ object frDTR: TfrDTR
         ScrollBars = ssBoth
         TabOrder = 0
         WordWrap = False
+        OnUTF8KeyPress = memL2UTF8KeyPress
       end
     end
   end
