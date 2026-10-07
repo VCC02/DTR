@@ -479,7 +479,10 @@ begin
   if MenuItem_EnableKeyReplacements.Checked then
     for i := 0 to Length(FKeyReplacementArr) - 1 do
       if UTF8Key = FKeyReplacementArr[i].OldKey then
+      begin
         UTF8Key := FKeyReplacementArr[i].NewKey;
+        Break;
+      end;
 end;
 
 

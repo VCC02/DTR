@@ -272,20 +272,27 @@ begin
         end;
       end;
 
-      memL1.Lines.BeginUpdate;
-      memL2.Lines.BeginUpdate;
+      memL1.Enabled := False;
+      memL2.Enabled := False;
       try
-        memL1.Clear;
-        memL2.Clear;
+        memL1.Lines.BeginUpdate;
+        memL2.Lines.BeginUpdate;
+        try
+          memL1.Clear;
+          memL2.Clear;
 
-        for i := 0 to L1Raw.Count - 1 do
-          memL1.Lines.Add(L1Raw.ValueFromIndex[i]);
+          for i := 0 to L1Raw.Count - 1 do
+            memL1.Lines.Add(L1Raw.ValueFromIndex[i]);
 
-        for i := 0 to L2Raw.Count - 1 do
-          memL2.Lines.Add(L2Raw.ValueFromIndex[i]);
+          for i := 0 to L2Raw.Count - 1 do
+            memL2.Lines.Add(L2Raw.ValueFromIndex[i]);
+        finally
+          memL1.Lines.EndUpdate;
+          memL2.Lines.EndUpdate;
+        end;
       finally
-        memL1.Lines.EndUpdate;
-        memL2.Lines.EndUpdate;
+        memL1.Enabled := True;
+        memL2.Enabled := True;
       end;
     finally
       L1.Free;
@@ -399,17 +406,28 @@ procedure TfrDTR.btnOverwriteRightClick(Sender: TObject);
 var
   i: Integer;
 begin
-  memL1.Lines.Clear;
-  memL2.Lines.Clear;
+  memL1.Visible := False;
+  memL2.Visible := False;
+  memL1.Enabled := False;
+  memL2.Enabled := False;
+  try
+    memL1.Lines.Clear;
+    memL2.Lines.Clear;
 
-  for i := 0 to Length(FDLArr) - 1 do
-  begin
-    try
-      memL1.Lines.Add(FDLArr[i].L1);
-      memL2.Lines.Add(FDLArr[i].L2);
-    except
-      FDLArr[i].L2 := 'ex';
+    for i := 0 to Length(FDLArr) - 1 do
+    begin
+      try
+        memL1.Lines.Add(FDLArr[i].L1);
+        memL2.Lines.Add(FDLArr[i].L2);
+      except
+        FDLArr[i].L2 := 'ex';
+      end;
     end;
+  finally
+    memL1.Enabled := True;
+    memL2.Enabled := True;
+    memL1.Visible := True;
+    memL2.Visible := True;
   end;
 
   Modified := True;
@@ -446,7 +464,10 @@ begin
   if (FEnableKeyReplacements <> nil) and (FEnableKeyReplacements^) then
     for i := 0 to Length(KeyReplacementArr) - 1 do
       if UTF8Key = KeyReplacementArr[i].OldKey then
+      begin
         UTF8Key := KeyReplacementArr[i].NewKey;
+        Break;
+      end;
 end;
 
 
