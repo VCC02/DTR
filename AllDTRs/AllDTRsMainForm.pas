@@ -52,8 +52,12 @@ type
     tmrStartup: TTimer;
     tmrSearch: TTimer;
     procedure edtSearchL1Change(Sender: TObject);
+    procedure edtSearchL1KeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
     procedure edtSearchL1UTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
     procedure edtSearchL2Change(Sender: TObject);
+    procedure edtSearchL2KeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
     procedure edtSearchL2UTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -68,6 +72,7 @@ type
     FActiveGroupIndex: Integer;
     FProjectGroupsCount: Integer;
     FKeyReplacementArr: TKeyReplacementArr;
+    FReplacementDown: Boolean;
 
     function GetGroupPrefixFromIndex: string;
     procedure LoadActiveProjectGroup(Ini: TMemIniFile; GroupPrefix: string);
@@ -121,6 +126,7 @@ begin
   FActiveTabIndexOnEmptySearch := -1;
   FActiveGroupIndex := -1;
   FProjectGroupsCount := 0;
+  FReplacementDown := False;
 
   tmrStartup.Enabled := True;
 end;
@@ -429,15 +435,17 @@ var
   i: Integer;
   FirstVisibleIndex, OldActiveIndex: Integer;
   Visibility: Boolean;
+  BothSearchBoxesAreEmpty: Boolean;
 begin
   tmrSearch.Enabled := False;
 
   FirstVisibleIndex := -1;
   OldActiveIndex := frTabs.ActiveTabIndex;
+  BothSearchBoxesAreEmpty := (edtSearchL1.Text = '') and (edtSearchL2.Text = '');
 
   for i := 0 to frTabs.TabCount - 1 do
   begin
-    Visibility := TfrDTR(frTabs.Content[i]).vstDual.VisibleCount > 0;
+    Visibility := (TfrDTR(frTabs.Content[i]).vstDual.VisibleCount > 0) or ((TfrDTR(frTabs.Content[i]).vstDual.RootNodeCount = 0) and BothSearchBoxesAreEmpty);
     frTabs.SetTabVisibilityByIndex(i, Visibility);
 
     if Visibility and (FirstVisibleIndex = -1) then
@@ -450,7 +458,7 @@ begin
       frTabs.ActiveTabIndex := FirstVisibleIndex;
   end;
 
-  if (edtSearchL1.Text = '') and (edtSearchL2.Text = '') then
+  if BothSearchBoxesAreEmpty then
     if FActiveTabIndexOnEmptySearch <> -1 then
       frTabs.ActiveTabIndex := FActiveTabIndexOnEmptySearch;
 end;
@@ -472,6 +480,13 @@ begin
 end;
 
 
+procedure TfrmAllDTRsMain.edtSearchL1KeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  FReplacementDown := False;
+end;
+
+
 procedure TfrmAllDTRsMain.HandleEditorUTF8KeyPress(var UTF8Key: TUTF8Char);
 var
   i: Integer;
@@ -479,10 +494,13 @@ begin
   if MenuItem_EnableKeyReplacements.Checked then
     for i := 0 to Length(FKeyReplacementArr) - 1 do
       if UTF8Key = FKeyReplacementArr[i].OldKey then
-      begin
-        UTF8Key := FKeyReplacementArr[i].NewKey;
-        Break;
-      end;
+        {$IFnDEF Windows} if not FReplacementDown then {$ENDIF}
+        begin
+          FReplacementDown := True;
+          UTF8Key := FKeyReplacementArr[i].NewKey;
+          Break;
+        end;
+
 end;
 
 
@@ -506,6 +524,13 @@ begin
     TfrDTR(frTabs.Content[i]).SetSearchL2(edtSearchL2.Text);
 
   tmrSearch.Enabled := True;
+end;
+
+
+procedure TfrmAllDTRsMain.edtSearchL2KeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  FReplacementDown := False;
 end;
 
 
