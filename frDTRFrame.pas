@@ -93,11 +93,17 @@ type
     procedure btnOverwriteRightClick(Sender: TObject);
     procedure btnSaveProjectClick(Sender: TObject);
     procedure edtSearchL1Change(Sender: TObject);
+    procedure edtSearchL1KeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
     procedure edtSearchL1UTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
     procedure edtSearchL2Change(Sender: TObject);
+    procedure edtSearchL2KeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
     procedure edtSearchL2UTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
     procedure FrameResize(Sender: TObject);
+    procedure memL1KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure memL1UTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
+    procedure memL2KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure memL2UTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
     procedure MenuItem_AppendToLeftClick(Sender: TObject);
     procedure MenuItem_AppendToRightClick(Sender: TObject);
@@ -142,6 +148,7 @@ type
     FSplitterMouseDownGlobalPos: TPoint;
     FSplitterMouseDownImagePos: TPoint;
     FEnableKeyReplacements: PBoolean;
+    FReplacementDown: Boolean;
 
     FOnSetProjectName: TOnSetProjectName;
 
@@ -157,6 +164,7 @@ type
     procedure DoOnSetProjectName(Sender: TObject; AName: string);
     procedure HandleEditorUTF8KeyPress(var UTF8Key: TUTF8Char);
     procedure vstDual_EditorUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
+    procedure vstDual_EditorKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 
     property Modified: Boolean read FModified write SetModified;
   public
@@ -197,6 +205,7 @@ begin
   FHold := False;
   SetLength(KeyReplacementArr, 0);
   FEnableKeyReplacements := nil;
+  FReplacementDown := False;
 end;
 
 
@@ -464,10 +473,12 @@ begin
   if (FEnableKeyReplacements <> nil) and (FEnableKeyReplacements^) then
     for i := 0 to Length(KeyReplacementArr) - 1 do
       if UTF8Key = KeyReplacementArr[i].OldKey then
-      begin
-        UTF8Key := KeyReplacementArr[i].NewKey;
-        Break;
-      end;
+        {$IFnDEF Windows} if not FReplacementDown then {$ENDIF}
+        begin
+          FReplacementDown := True;
+          UTF8Key := KeyReplacementArr[i].NewKey;
+          Break;
+        end;
 end;
 
 
@@ -479,6 +490,13 @@ begin
     edtSearchL1.Color := clYellow
   else
     edtSearchL1.Color := clWindow;
+end;
+
+
+procedure TfrDTR.edtSearchL1KeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  FReplacementDown := False;
 end;
 
 
@@ -496,6 +514,13 @@ begin
     edtSearchL2.Color := clYellow
   else
     edtSearchL2.Color := clWindow;
+end;
+
+
+procedure TfrDTR.edtSearchL2KeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  FReplacementDown := False;
 end;
 
 
@@ -695,9 +720,21 @@ begin                                   //this method doesn't seem to be called 
 end;
 
 
+procedure TfrDTR.memL1KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  FReplacementDown := False;
+end;
+
+
 procedure TfrDTR.memL1UTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
 begin
   HandleEditorUTF8KeyPress(UTF8Key);
+end;
+
+
+procedure TfrDTR.memL2KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  FReplacementDown := False;
 end;
 
 
@@ -797,6 +834,12 @@ begin
 end;
 
 
+procedure TfrDTR.vstDual_EditorKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  FReplacementDown := False;
+end;
+
+
 procedure TfrDTR.vstDualCreateEditor(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; out EditLink: IVTEditLink);
 var
@@ -810,6 +853,7 @@ begin
   FTextEditorEditBox.Font.Size := 8;
   //FTextEditorEditBox.Height := vstVariables.DefaultNodeHeight - 3;  //set again in timer
   FTextEditorEditBox.OnUTF8KeyPress := @vstDual_EditorUTF8KeyPress;
+  FTextEditorEditBox.OnKeyUp := @vstDual_EditorKeyUp;
 
   FTextEditorEditBox.Show;
 end;

@@ -19,6 +19,7 @@ object frmAllDTRsMain: TfrmAllDTRsMain
     TabOrder = 0
     TextHint = 'Search All L1'
     OnChange = edtSearchL1Change
+    OnKeyUp = edtSearchL1KeyUp
     OnUTF8KeyPress = edtSearchL1UTF8KeyPress
   end
   object edtSearchL2: TEdit
@@ -30,6 +31,7 @@ object frmAllDTRsMain: TfrmAllDTRsMain
     TabOrder = 1
     TextHint = 'Search All L2'
     OnChange = edtSearchL2Change
+    OnKeyUp = edtSearchL2KeyUp
     OnUTF8KeyPress = edtSearchL2UTF8KeyPress
   end
   object spdbtnProjectGroups: TSpeedButton
